@@ -1,11 +1,11 @@
-(ns juan.indicator.pivot-nearby
+(ns pivot.indicator.nearby
   (:require
    [tick.core :as t]
    [tech.v3.dataset :as tds]
    [tech.v3.datatype.functional :as dfn]
    [tech.v3.datatype :as dtype]
    [tablecloth.api :as tc]
-   [study.pivot-db :refer [get-pivots]]
+   [pivot.db :refer [get-pivots]]
    [juan.data.pips :refer [get-pip-mult]]))
 
 (defn empty->nil [v]

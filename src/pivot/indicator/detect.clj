@@ -1,4 +1,4 @@
-(ns juan.indicator.pivot
+(ns pivot.indicator.detect
   (:require
    [tech.v3.dataset.rolling :as r]
    [tech.v3.datatype.functional :as dfn]
@@ -30,8 +30,11 @@
                              (not (:pivot-low row))
                              (< idx-min (:idx row) idx-max))))))
 
-(defn pivots [bar-ds {:keys [n debug?]
-                      :or {debug? false}}]
+(defn pivots 
+  "input is a tml dataset with bars (open high low close volume)
+   and n the number of bars to extend to both sides of each point.
+   will return a tml dataset with :pivot-low :pivot-high :pivot-range pivot-volume :idx"
+  [bar-ds {:keys [n]}]
   (let [bar-t-ds (r/rolling bar-ds
                             {:window-type :fixed
                              :window-size (inc (* 2 n)) ; 2n+1
@@ -57,6 +60,4 @@
                        :pivot-range (dfn/- (:thigh bar-t-ds) (:tlow bar-t-ds))
                        :pivot-volume pivot-volume
                        :idx (range row-count)})]
-    (if debug?
-      bar-pivot-ds
-      (select-pivots n (- row-count n) bar-pivot-ds))))
+    (select-pivots n (- row-count n) bar-pivot-ds)))

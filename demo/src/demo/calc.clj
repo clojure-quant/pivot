@@ -1,83 +1,31 @@
-(ns study.pivot-calc
+(ns demo.calc
   (:require
    [tick.core :as t]
-   [tablecloth.api :as tc]
-   [missionary.core :as m]
-   [tech.v3.datatype.functional :as dfn]
-   [tech.v3.datatype :as dtype]
-   [rtable.plot.vega :as plot]
-   [quanta.bar.transform.shuffle :refer [shuffle-bar-series]]
-   [quanta.studio.algo :refer [get-window-trailing]]
-   [quanta.studio.safe :refer [get-trailing-bars]]
-   [study.env :refer [env]]
-   [study.pivot-db :refer [save-ds]]
-   [juan.data.asset-pairs :refer [assets2]]
-   [juan.indicator.pivot :as p]))
+   [quanta.calendar.window :as w]
+   [pivot.calc :refer [calc-multi-window calc-multi-window-multi-assets]]
+   [demo.env :refer [env assets2]]
+   [pivot.db]))
 
-(defn load-bars [{:keys [asset trailing-n calendar dt shuffle?]}]
-  (let [bars (m/? (get-trailing-bars env
-                                     {:asset asset
-                                      :trailing-n trailing-n
-                                      :calendar calendar}
-                                     dt))]
-    (if shuffle?
-      (shuffle-bar-series bars)
-      bars)))
-
-(defn consolidate-pivots [ds]
-  (let [pivot-price-fn (fn [pivot-low pivot-high] (or pivot-low pivot-high))
-        pivot-type-fn (fn [pivot-low pivot-high]
-                        (cond
-                          pivot-low :low
-                          pivot-high :high
-                          :else :unknown))
-        pivot-price (dtype/clone (dtype/emap pivot-price-fn :float64 (:pivot-low ds) (:pivot-high ds)))
-        pivot-type (dtype/clone (dtype/emap pivot-type-fn :keyword (:pivot-low ds) (:pivot-high ds)))]
-    (-> ds
-        (tc/add-columns {:pivot-price pivot-price
-                         :pivot-type pivot-type})
-        (tc/select-columns [:asset :n :date :pivot-price :pivot-type :pivot-range :pivot-volume :idx :date-detected]))))
-
-(defn calc-pivots [{:keys [ds n asset]}]
-  (-> ds
-      (p/pivots {:n n :debug? false})
-      (tc/select-columns [:date :idx :pivot-low :pivot-high :date-detected :pivot-range :pivot-volume])
-      (tc/add-column :n n)
-      (tc/add-column :asset asset)
-      (consolidate-pivots)))
-
-(defn calc-multi-window [{:keys [asset trailing-n calendar dt shuffle? windows] :as opts}]
-  ; loads bars only once for all windows that are calculated.
-  (let [ds (load-bars (dissoc opts :windows))
-        calc-window (fn [n] (calc-pivots {:ds ds :n n :asset asset}))]
-    (->> (map calc-window windows)
-         (apply tc/concat))))
-
-(defn calc-multi-window-multi-assets [{:keys [assets trailing-n calendar dt shuffle? windows] :as opts}]
-  (let [calc-asset (fn [asset]
-                     (calc-multi-window (assoc opts :asset asset)))
-        ds-seq (map calc-asset assets)]
-    (apply tc/concat ds-seq)))
-
-
+(def calendar [:forex :m])
 
 (calc-multi-window
+ env
  {:asset "EURUSD"
-  :trailing-n 50000
-  :dt (t/instant "2025-04-21T22:00:00Z")
-  :calendar [:forex :m]
+  :calendar calendar
   :windows [240 480 720 1440
-             ;4h 8h  12h 24h
-            ]})
+            ;4h 8h  12h 24h
+            ]
+  :window (w/create-trailing-window calendar 50000 (t/instant "2025-04-21T22:00:00Z"))})
 
 (calc-multi-window-multi-assets
+ env
  {:assets  assets2
-  :trailing-n 50000
-  :dt (t/instant "2025-04-21T22:00:00Z")
-  :calendar [:forex :m]
+  :calendar calendar
   :windows [240 480 720 1440
              ;4h 8h  12h 24h
-            ]})
+            ]
+  :window (w/create-trailing-window calendar 50000 (t/instant "2025-04-21T22:00:00Z"))
+  })
 
 ;[3474 8]:
 ;| :asset |   :n |                :date | :pivot-price | :pivot-type | :pivot-range |  :idx |       :date-detected |
@@ -108,12 +56,15 @@
 
 (def pivot-ds
   (calc-multi-window-multi-assets
+   env 
    {:assets  assets2
-    :trailing-n 50000
-    :dt (t/instant "2025-04-21T22:00:00Z")
-    :calendar [:forex :m]
+    :calendar calendar
     :windows [240 480 720 1440
                ;4h 8h  12h 24h
-              ]}))
+              ]
+    :window (w/create-trailing-window calendar 50000 (t/instant "2025-04-21T22:00:00Z"))
+    }))
 
-(save-ds pivot-ds)
+pivot-ds
+
+(pivot.db/save-ds pivot-ds)

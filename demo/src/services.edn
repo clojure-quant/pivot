@@ -1,0 +1,54 @@
+ {:modular (modular.system/modular-env)  ; {:profile "jetty"  :config ["demo.edn" "secrets.edn"]}
+  :components
+  {:config1 {:start (modular.config/load-config! (:config #ref [:modular]))}
+   :config {:start (deref (clip/ref :config1))}
+
+   :exts {:start (extension/discover (:extension (clip/ref :config)))}
+
+   :timbre {:start (modular.log/timbre-config! (:timbre/clj  (clip/ref :config)))}
+
+   ; transit-encoding
+   :transit-tick {:start (transit.type.tick/add-tick-handlers!)}
+   :transit-ds {:start (cquant.transit.techml/add-techml-dataset-handlers!)}
+
+   ;; BAR DB + MARKET DATA 
+   
+   :duckdb {; duck-db db has .ddb extension
+            :start (quanta.bar.db.duck/start-bardb-duck "../db/ctrader-quotes.ddb")
+            :stop (quanta.bar.db.duck/stop-bardb-duck this)}
+
+  ; STRATEGY
+   
+   :env {:start {:bar-db (clip/ref :duckdb)
+                 :dali-store ;(deref dali.store.cache/dali-cache-store)
+                 (dali.store.file/create-dali-file-store {:fpath ".gorilla/public/dali" :rpath "/r/dali"})
+                 }}
+
+   ;; services
+   
+   :exec {:start (flowy.executor/start-executor
+                  {:env (clip/ref :env)
+                   :exts (clip/ref :exts)}
+                  (:services (clip/ref :config)))}
+
+   ;; webserver
+   :webly {:start (webly.spa/start-webly
+                   {:exts (clip/ref :exts)
+                    :ctx {:flowy (flowy.reflower/start-reflower (clip/ref :exec))}}
+                   (clip/ref :config)
+                   (:profile #ref [:modular]))
+           :stop (webly.spa/stop-webly this)}
+
+   ;; NREPL
+   
+   :nrepl {:start (nrepl.server/start-server
+                   :bind "0.0.0.0"
+                   :port 9200
+                   :middleware cider.nrepl.middleware/cider-middleware
+                   :handler cider.nrepl/cider-nrepl-handler)
+           :stop (.close this)}
+
+
+   
+;
+   }}

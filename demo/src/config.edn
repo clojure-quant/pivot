@@ -1,0 +1,27 @@
+{:timbre/clj {:min-level [[#{"org.apache.http.*"
+                             "org.eclipse.aether.*"
+                             "org.eclipse.jetty.*"
+                             "webly.web.*"
+                             "quanta.bar.db.duck.append-bars"
+                             "quanta.bar.db.duck.append-bars.*"
+                             "quanta.bar.db.duck"
+                             "quanta.bar.env"} :warn] ; webserver stuff - warn only
+                          [#{"*"} :info]] ; default -> info
+              :appenders {:default {:type :console-color}}}
+
+ :spa {:title "Pivot"
+       :mount-fn router.app/mount}
+
+ :reitit {:wrap demo.app/wrap-app}
+
+ :web-server {:http {:port 8085 :host "0.0.0.0"}}
+
+ :scratchpad {:tap true}
+
+ :extension {:disabled #{"ui-tailwind"
+                         "missionary-sci"}}
+;
+ }
+
+ 
+ 

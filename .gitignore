@@ -1,0 +1,8 @@
+.nrepl-port
+.cpcache
+.calva
+.lsp
+**/.clj-kondo/.cache
+classes
+binaries
+.gorilla
