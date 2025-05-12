@@ -1,0 +1,15 @@
+{:name "demo"
+ :lazy true ; must be true, since it depends on dali
+ :depends-on #{:dali :dali-flowy :rtable-cheetah :tick-util}
+ :cljs-namespace [demo.app]
+ :cljs-ns-bindings {'demo.app {'wrap-app demo.app/wrap-app
+                               'routes demo.app/routes
+                               'page demo.app/page}}
+
+  ; runtime
+ :cljs-routes-reitit demo.app/routes
+
+ :flowy [; one services is defined here, 
+         ; the rest of the services are defined in the config.
+         ]}
+

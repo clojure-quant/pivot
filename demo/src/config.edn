@@ -14,7 +14,7 @@
 
  :reitit {:wrap demo.app/wrap-app}
 
- :web-server {:http {:port 8085 :host "0.0.0.0"}}
+ :web-server {:http {:port 8085 :ip "0.0.0.0"}}
 
  :scratchpad {:tap true}
 

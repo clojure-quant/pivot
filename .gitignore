@@ -6,3 +6,10 @@
 classes
 binaries
 .gorilla
+.shadow-cljs
+node_modules
+package.json
+package-lock.json
+karma.conf.js
+shadow-cljs.edn
+.flowy

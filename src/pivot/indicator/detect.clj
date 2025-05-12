@@ -14,7 +14,7 @@
     (first pv)))
 
 (defn pivot-volume [pvh pvl]
-  (cond 
+  (cond
     pvh (second pvh)
     pvl (second pvl)
     :else nil))
@@ -30,7 +30,20 @@
                              (not (:pivot-low row))
                              (< idx-min (:idx row) idx-max))))))
 
-(defn pivots 
+(defn consolidate-pivots [ds]
+  (let [pivot-price-fn (fn [pivot-low pivot-high] (or pivot-low pivot-high))
+        pivot-type-fn (fn [pivot-low pivot-high]
+                        (cond
+                          pivot-low :low
+                          pivot-high :high
+                          :else :unknown))
+        pivot-price (dtype/clone (dtype/emap pivot-price-fn :float64 (:pivot-low ds) (:pivot-high ds)))
+        pivot-type (dtype/clone (dtype/emap pivot-type-fn :keyword (:pivot-low ds) (:pivot-high ds)))]
+    (-> ds
+        (tc/add-columns {:pivot-price pivot-price
+                         :pivot-type pivot-type}))))
+
+(defn pivots
   "input is a tml dataset with bars (open high low close volume)
    and n the number of bars to extend to both sides of each point.
    will return a tml dataset with :pivot-low :pivot-high :pivot-range pivot-volume :idx"
@@ -41,8 +54,7 @@
                              :relative-window-position :center}
                             {:thigh (r/max :high)
                              :tlow (r/min :low)
-                             :date-detected (r/last :date)
-                             })
+                             :date-detected (r/last :date)})
         pivot-low-volume (dtype/emap pivot :object (:low bar-ds) (:volume bar-ds) (:tlow bar-t-ds))
         pivot-high-volume (dtype/emap pivot :object (:high bar-ds) (:volume bar-ds) (:thigh bar-t-ds))
 
@@ -60,4 +72,5 @@
                        :pivot-range (dfn/- (:thigh bar-t-ds) (:tlow bar-t-ds))
                        :pivot-volume pivot-volume
                        :idx (range row-count)})]
-    (select-pivots n (- row-count n) bar-pivot-ds)))
+    (-> (select-pivots n (- row-count n) bar-pivot-ds)
+        (consolidate-pivots))))

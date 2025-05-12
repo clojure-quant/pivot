@@ -3,8 +3,9 @@
    [tick.core :as t]
    [quanta.calendar.window :as w]
    [pivot.calc :refer [calc-multi-window calc-multi-window-multi-assets]]
+   [pivot.db]
    [demo.env :refer [env assets2]]
-   [pivot.db]))
+   ))
 
 (def calendar [:forex :m])
 
