@@ -20,8 +20,7 @@
       (p/pivots {:n n})
       (tc/add-column :n n)
       (tc/add-column :asset asset)
-      (tc/select-columns [:asset :n :date :pivot-price :pivot-type :pivot-range :pivot-volume :idx :date-detected])
-      ))
+      (tc/select-columns [:asset :n :date :pivot-price :pivot-type :pivot-range :pivot-volume :idx :date-detected])))
 
 (defn calc-multi-window
   "calculates pivots for one asset with multiple windows
@@ -46,3 +45,13 @@
         ds-seq (map calc-asset assets)]
     (apply tc/concat ds-seq)))
 
+(defn- highest-n [ds]
+  (-> ds
+      (tc/order-by :n :desc)
+      (tc/select-rows [0])))
+
+(defn only-highest-n-per-date [pivots]
+  (-> pivots
+      (tc/group-by :date)
+      (tc/process-group-data highest-n)
+      (tc/ungroup)))

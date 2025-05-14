@@ -16,6 +16,9 @@
   org.pinkgorilla/dali {:mvn/version "0.5.37"}
   org.pinkgorilla/dali-table {:mvn/version "0.3.99"}
 
+  ; smile
+  org.clojars.haifengl/smile {:mvn/version "4.2.0"}
+
   ; repl
   nrepl/nrepl {:mvn/version "1.3.1"}
   cider/cider-nrepl {:mvn/version "0.52.1"}

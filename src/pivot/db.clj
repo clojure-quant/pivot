@@ -6,10 +6,7 @@
    [babashka.fs :refer [create-dirs]]
    [tech.v3.datatype.functional :as dfn]
    [tech.v3.datatype :as dtype]
-   [quanta.bar.db.nippy :as nippy]
-   ;[juan.util :refer [load-ds-nippy save-ds-nippy spit-ds]]
-   ;[juan.data.pips :refer [->price]]
-   ))
+   [quanta.bar.db.nippy :as nippy]))
 
 (def dir ".pivots")
 (create-dirs dir)

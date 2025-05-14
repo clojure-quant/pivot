@@ -3,9 +3,9 @@
  {org.clojure/clojure    {:mvn/version "1.11.3"}
   tick/tick {:mvn/version "0.7.5"}
   missionary/missionary {:mvn/version "b.39"}
-  org.pinkgorilla/dali-table {:mvn/version "0.3.99"}
   io.github.clojure-quant/techml-dataset-cljs {:mvn/version "0.3.29"} ; techml dataset/tablecloth + techml-transit-encoding (fixes the cloning issues)
   io.github.clojure-quant/quanta-bar-warehouse {:mvn/version "0.5.56"} ; bar-env, duckdb, bargenerator, barcompressor
+  org.pinkgorilla/dali-table {:mvn/version "0.3.99"} ; vega plots
   }
 
  :aliases
