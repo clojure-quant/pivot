@@ -5,7 +5,11 @@
  {org.clojure/clojure    {:mvn/version "1.12.0"}
   io.github.clojure-quant/pivot {:local/root "../" :deps/manifest :deps}
   io.github.clojure-quant/quanta-calendar {:mvn/version "0.6.27"} ; calendar env
+  io.github.clojure-quant/quanta-indicator-math {:mvn/version "0.5.5"} ; indicators
   
+  ; smile
+  org.clojars.haifengl/smile {:mvn/version "4.2.0"}
+
   ; frontend
   org.pinkgorilla/webly {:mvn/version "0.9.724"} ; build tool
   org.pinkgorilla/extension {:mvn/version "0.0.16"}
@@ -14,10 +18,6 @@
   org.pinkgorilla/ui-repl {:mvn/version "0.1.115"} ; tick-transit-encoding
   org.pinkgorilla/flowy {:mvn/version "0.1.43"}
   org.pinkgorilla/dali {:mvn/version "0.5.37"}
-  org.pinkgorilla/dali-table {:mvn/version "0.3.99"}
-
-  ; smile
-  org.clojars.haifengl/smile {:mvn/version "4.2.0"}
 
   ; repl
   nrepl/nrepl {:mvn/version "1.3.1"}

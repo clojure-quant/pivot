@@ -50,7 +50,10 @@
       (tc/order-by :n :desc)
       (tc/select-rows [0])))
 
-(defn only-highest-n-per-date [pivots]
+(defn only-highest-n-per-date 
+  "filters pivots, so that when on a specific :date/:pivot-price are pivots
+   from multiple n-windows, so that only the highest n-window would be shown"
+  [pivots]
   (-> pivots
       (tc/group-by :date)
       (tc/process-group-data highest-n)
