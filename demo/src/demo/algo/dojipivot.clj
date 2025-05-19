@@ -29,7 +29,7 @@
                              :window (w/create-trailing-window calendar-doji 80000 (t/instant "2025-05-07T20:00:00Z"))})
         dojis (-> bars
                   (select-dojis-at-high-low opts)
-                  ;(tc/select-rows (fn [row]  (> (:volume row) 100)))
+                  (tc/select-rows (fn [row]  (> (:volume row) 500)))
                   )
         pivots (calc-multi-window
                 env
@@ -110,6 +110,20 @@
               :min-range-percent 0.7
               :trailing-n 6})
   
+  (-> (calc "EURUSD"
+            {:min-wick-percent 0.7
+             :range-sma-n 6
+             :min-range-percent 0.7
+             :trailing-n 6})
+      :dojis
+      (tc/select-rows (fn [row]  (> (:volume row) 500)))
+      
+      )
+   
+
+  
+
+
   ;
   )
 
